@@ -11,6 +11,7 @@ body:
       placeholder: 2025-11-22
     validations:
       required: true
+
   - type: input
     id: presenter_username
     attributes:
@@ -18,24 +19,28 @@ body:
       placeholder: adnane
     validations:
       required: true
+
   - type: input
     id: presenter_first
     attributes:
       label: First name
     validations:
       required: true
+
   - type: input
     id: presenter_last
     attributes:
       label: Last name
     validations:
       required: true
+
   - type: input
     id: title
     attributes:
       label: Paper title
     validations:
       required: true
+
   - type: input
     id: paper_url
     attributes:
@@ -43,6 +48,7 @@ body:
       placeholder: https://arxiv.org/abs/xxxx.xxxxx
     validations:
       required: true
+
   - type: textarea
     id: description
     attributes:
@@ -50,6 +56,7 @@ body:
       placeholder: One or two lines…
     validations:
       required: false
+
   - type: input
     id: recording_url
     attributes:
