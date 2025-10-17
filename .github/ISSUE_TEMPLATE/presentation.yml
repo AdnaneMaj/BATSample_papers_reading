@@ -8,7 +8,7 @@ body:
     attributes:
       label: Weekend date (yyyy-mm-dd)
       description: Must be Saturday or Sunday
-      placeholder: 2025-11-22
+      placeholder: "2025-11-22"   # ← QUOTED
     validations:
       required: true
 
@@ -16,7 +16,7 @@ body:
     id: presenter_username
     attributes:
       label: Username (profile key)
-      placeholder: adnane
+      placeholder: "adnane"       # safe to quote too
     validations:
       required: true
 
@@ -45,7 +45,7 @@ body:
     id: paper_url
     attributes:
       label: Paper URL (arXiv, PDF, etc.)
-      placeholder: https://arxiv.org/abs/xxxx.xxxxx
+      placeholder: "https://arxiv.org/abs/xxxx.xxxxx"
     validations:
       required: true
 
@@ -53,7 +53,7 @@ body:
     id: description
     attributes:
       label: Optional short description
-      placeholder: One or two lines…
+      placeholder: "One or two lines…"
     validations:
       required: false
 
