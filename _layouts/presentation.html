@@ -1,0 +1,26 @@
+---
+layout: default
+---
+
+<article>
+  <h1>{{ page.title }}</h1>
+  <p><strong>Date:</strong> {{ page.date | date: "%B %d, %Y" }}</p>
+
+  <p>
+    <strong>Presenter:</strong>
+    <a href="{{ '/presenters/' | append: page.presenter_username | append: '.html' | relative_url }}">
+      {{ page.presenter_first }} {{ page.presenter_last }}
+    </a>
+  </p>
+
+  <p><strong>Paper:</strong> <a href="{{ page.paper_url }}">{{ page.paper_url }}</a></p>
+
+  {% if page.description %}
+    <h2>Description</h2>
+    <p>{{ page.description }}</p>
+  {% endif %}
+
+  {% if page.recording_url %}
+    <p><a href="{{ page.recording_url }}">Watch recording</a></p>
+  {% endif %}
+</article>

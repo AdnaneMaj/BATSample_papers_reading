@@ -1,0 +1,12 @@
+---
+layout: default
+title: Presenters
+---
+
+<h1>Presenter Profiles</h1>
+<ul>
+{% assign grouped = site.presentations | group_by: "presenter_username" %}
+{% for g in grouped %}
+  <li><a href="/presenters/{{ g.name }}.html">{{ g.items[0].presenter_first }} {{ g.items[0].presenter_last }}</a></li>
+{% endfor %}
+</ul>

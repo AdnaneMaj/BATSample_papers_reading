@@ -1,0 +1,124 @@
+name: Issue to PR
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  build-pr:
+    if: contains(github.event.issue.labels.*.name, 'presentation')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract fields from Issue Form
+        id: fields
+        run: |
+          BODY=$(jq -r '.issue.body' < "$GITHUB_EVENT_PATH")
+          # Issue Forms render as a table-like body; extract by headings:
+          get() { echo "$BODY" | awk -v k="$1" '
+            BEGIN{IGNORECASE=1}
+            $0 ~ "^### "k"$" {getline; getline; print; exit}
+          '; }
+          DATE=$(get "Weekend date")
+          USER=$(get "Username")
+          FIRST=$(get "First name")
+          LAST=$(get "Last name")
+          TITLE=$(get "Paper title")
+          URL=$(get "Paper URL")
+          DESC=$(get "Optional short description")
+          REC=$(get "Recording URL")
+
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+          echo "username=$USER" >> $GITHUB_OUTPUT
+          echo "first=$FIRST" >> $GITHUB_OUTPUT
+          echo "last=$LAST" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "paper_url=$URL" >> $GITHUB_OUTPUT
+          echo "description=$DESC" >> $GITHUB_OUTPUT
+          echo "recording_url=$REC" >> $GITHUB_OUTPUT
+
+      - name: Validate weekend and clashes
+        run: |
+          DATE="${{ steps.fields.outputs.date }}"
+          # ensure Saturday(6) or Sunday(0)
+          DOW=$(date -d "$DATE" +%w) || { echo "Invalid date"; exit 1; }
+          if [ "$DOW" != "6" ] && [ "$DOW" != "0" ]; then
+            echo "::error::Date must be Saturday or Sunday"; exit 1
+          fi
+          # no conflicts
+          if ls _presentations/*-"$DATE"-*.md 2>/dev/null; then
+            echo "::error::There is already a presentation for $DATE"; exit 1
+          fi
+
+      - name: Create presentation file
+        run: |
+          DATE="${{ steps.fields.outputs.date }}"
+          USER="${{ steps.fields.outputs.username }}"
+          FILE="_presentations/${DATE}-${USER}.md"
+          mkdir -p _presentations presenters
+          cat > "$FILE" <<MD
+---
+layout: presentation
+date: ${DATE}
+presenter_username: ${{ steps.fields.outputs.username }}
+presenter_first: ${{ steps.fields.outputs.first }}
+presenter_last: ${{ steps.fields.outputs.last }}
+title: "${{ steps.fields.outputs.title }}"
+paper_url: "${{ steps.fields.outputs.paper_url }}"
+description: "${{ steps.fields.outputs.description }}"
+recording_url: "${{ steps.fields.outputs.recording_url }}"
+---
+MD
+
+          # Also ensure a simple presenter page exists
+          PFILE="presenters/${{ steps.fields.outputs.username }}.md"
+          if [ ! -f "$PFILE" ]; then
+            cat > "$PFILE" <<P
+---
+layout: default
+title: "${{ steps.fields.outputs.first }} ${{ steps.fields.outputs.last }}"
+---
+
+<h1>${{ steps.fields.outputs.first }} ${{ steps.fields.outputs.last }}</h1>
+
+<h2>Upcoming</h2>
+<ul>
+{% assign today = 'now' | date: '%Y-%m-%d' %}
+{% assign mine = site.presentations | where: 'presenter_username', '${{ steps.fields.outputs.username }}' %}
+{% assign upcoming = mine | where_exp: "p", "p.date >= today" | sort: "date" %}
+{% for p in upcoming %}
+  <li><a href="{{ p.url }}">{{ p.title }}</a> — {{ p.date }}</li>
+{% endfor %}
+</ul>
+
+<h2>Past</h2>
+<ul>
+{% assign past = mine | where_exp: "p", "p.date < today" | sort: "date" | reverse %}
+{% for p in past %}
+  <li>
+    <a href="{{ p.url }}">{{ p.title }}</a> — {{ p.date }}
+    {% if p.recording_url %} — <a href="{{ p.recording_url }}">Recording</a>{% endif %}
+  </li>
+{% endfor %}
+</ul>
+P
+          fi
+
+      - name: Open PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: "presentations/${{ steps.fields.outputs.date }}-${{ steps.fields.outputs.username }}"
+          title: "Add presentation: ${{ steps.fields.outputs.date }} — ${{ steps.fields.outputs.username }}"
+          commit-message: "Add presentation for ${{ steps.fields.outputs.date }}"
+          body: "Auto-generated from issue #${{ github.event.issue.number }}"
+
+      - name: Comment back on issue
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: "Thanks! A PR has been opened for review."

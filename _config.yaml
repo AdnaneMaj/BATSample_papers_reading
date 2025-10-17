@@ -1,0 +1,6 @@
+title: Community Paper Reading
+collections:
+  presentations:
+    output: true
+    permalink: /presentations/:name/
+timezone: Africa/Casablanca

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title | default: site.title }}</title>
+    <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+    <style>
+      body {
+        font-family: system-ui, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f9f9f9;
+        color: #222;
+      }
+      header {
+        background: #0277bd;
+        color: #fff;
+        padding: 1rem;
+      }
+      header h1 { margin: 0; font-size: 1.5rem; }
+      nav a {
+        color: white;
+        margin-right: 1rem;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      main {
+        max-width: 750px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      }
+      footer {
+        text-align: center;
+        color: #777;
+        margin: 2rem 0;
+        font-size: 0.9rem;
+      }
+      a { color: #0277bd; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1><a href="{{ '/' | relative_url }}" style="color:white; text-decoration:none;">{{ site.title | default: "Paper Reading Community" }}</a></h1>
+      <nav>
+        <a href="{{ '/' | relative_url }}">Home</a>
+        <a href="{{ '/presenters.html' | relative_url }}">Presenters</a>
+        <a href="https://github.com/{{ site.github_username }}/{{ site.github_repo }}/issues/new?template=presentation.yml">Submit Paper</a>
+      </nav>
+    </header>
+
+    <main>
+      {{ content }}
+    </main>
+
+    <footer>
+      &copy; {{ site.time | date: "%Y" }} Paper Reading Community — powered by GitHub Pages
+    </footer>
+  </body>
+</html>
