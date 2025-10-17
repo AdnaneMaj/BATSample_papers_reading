@@ -4,7 +4,7 @@ title: Upcoming
 ---
 
 <h1>Upcoming Presentations</h1>
-<p><a class="btn" href="https://github.com/<OWNER>/<REPO>/issues/new?template=presentation.yml">Submit your paper</a></p>
+<p><a class="btn" href="https://github.com/AdnaneMaj/BATSample_papers_reading/issues/new?template=presentation.yml">Submit your paper</a></p>
 
 <ul>
 {% assign today = 'now' | date: '%Y-%m-%d' %}
